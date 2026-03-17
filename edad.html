@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Edad</title>
+    <style>
+        /* =========================================
+           VARIABLES Y CONFIGURACIÓN BASE
+           ========================================= */
+        :root {
+            --primary-color: #8b5cf6;    /* Morado moderno */
+            --primary-hover: #7c3aed;    /* Morado oscuro */
+            --bg-color: #f8fafc;         /* Fondo claro gris/azulado */
+            --surface-color: #ffffff;    /* Fondo de la tarjeta */
+            --text-main: #0f172a;        /* Texto principal */
+            --text-muted: #64748b;       /* Texto secundario */
+            --border-color: #e2e8f0;     /* Bordes */
+            --danger-color: #ef4444;     /* Color de error/advertencia */
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           HEADER Y NAVEGACIÓN
+           ========================================= */
+        header {
+            text-align: center;
+            padding: 2rem 1rem 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-hover);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+        }
+
+        .nav-link {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 1.1em;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        .nav-link a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        /* =========================================
+           ESPACIOS DE ANUNCIOS
+           ========================================= */
+        .ad-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            color: #94a3b8;
+            font-weight: 600;
+            margin: 1.5rem auto;
+            text-align: center;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .ad-leaderboard {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+        }
+
+        .ad-rectangle {
+            width: 300px;
+            height: 250px;
+            margin: 2rem auto;
+        }
+
+        /* =========================================
+           LAYOUT PRINCIPAL Y COMPONENTES
+           ========================================= */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .calculator-card {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .input-group input[type="date"] {
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+            color: var(--text-main);
+            transition: border-color 0.3s;
+        }
+
+        .input-group input[type="date"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-main, .btn-secondary {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+
+        .btn-main {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-main:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-main:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+
+        /* Mensaje de advertencia */
+        .warning-msg {
+            color: var(--danger-color);
+            background-color: #fee2e2;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+        }
+
+        /* Resultados */
+        .results-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .result-box {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-box.full-width {
+            grid-column: span 3;
+            /* Estilo especial para los resultados grandes */
+            background-color: #f5f3ff;
+            border-color: #ede9fe;
+        }
+
+        .result-box h4 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-box span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-hover);
+        }
+
+        .result-box.full-width span {
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .result-box.full-width {
+                grid-column: span 1;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .calculator-card {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <h1>Calculadora de Edad</h1>
+            <p class="subtitle">Descubre tu edad exacta en años, meses y días</p>
+        </header>
+
+        <div class="nav-link">
+            <a href="https://tools.nocturnmc.com/">← Volver a la página principal</a>
+        </div>
+
+        <div class="ad-container ad-leaderboard">
+            Espacio para anuncio (728x90)
+        </div>
+
+        <main>
+            <section class="calculator-card">
+                
+                <div id="error-msg" class="warning-msg"></div>
+
+                <div class="input-group">
+                    <label for="dob">Fecha de nacimiento</label>
+                    <input type="date" id="dob" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="current-date">Fecha actual</label>
+                    <input type="date" id="current-date">
+                </div>
+
+                <div class="actions">
+                    <button class="btn-main" id="btn-calculate">Calcular edad</button>
+                    <button class="btn-secondary" id="btn-clear">Limpiar</button>
+                </div>
+
+                <div id="results" class="results-container">
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <h4>Años</h4>
+                            <span id="res-years">0</span>
+                        </div>
+                        <div class="result-box">
+                            <h4>Meses</h4>
+                            <span id="res-months">0</span>
+                        </div>
+                        <div class="result-box">
+                            <h4>Días</h4>
+                            <span id="res-days">0</span>
+                        </div>
+                        <div class="result-box full-width">
+                            <h4>Total de días vividos</h4>
+                            <span id="res-total-days">0 días</span>
+                        </div>
+                        <div class="result-box full-width">
+                            <h4>Próximo cumpleaños</h4>
+                            <span id="res-next-bday">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="ad-container ad-rectangle">
+                Espacio para anuncio (300x250)
+            </div>
+        </main>
+    </div>
+
+    <!-- FOOTER EXÁCTAMENTE IGUAL AL SOLICITADO -->
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.9em; color: #666;">
+        <p>
+            <a href="https://tools.nocturnmc.com/" style="color: #3498db; text-decoration: none; margin: 0 10px;">Inicio</a> |
+            <a href="https://tools.nocturnmc.com/privacidad.html" style="color: #3498db; text-decoration: none; margin: 0 10px;">Política de Privacidad</a>
+        </p>
+        <p style="margin-top: 10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const dobInput = document.getElementById('dob');
+        const currentDateInput = document.getElementById('current-date');
+        const btnCalculate = document.getElementById('btn-calculate');
+        const btnClear = document.getElementById('btn-clear');
+        const errorMsg = document.getElementById('error-msg');
+        const resultsContainer = document.getElementById('results');
+        
+        // Result elements
+        const resYears = document.getElementById('res-years');
+        const resMonths = document.getElementById('res-months');
+        const resDays = document.getElementById('res-days');
+        const resTotalDays = document.getElementById('res-total-days');
+        const resNextBday = document.getElementById('res-next-bday');
+
+        // Inicializar fecha actual con la fecha de hoy local
+        function initCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            currentDateInput.value = `${year}-${month}-${day}`;
+        }
+
+        // Crear objeto Date usando solo año, mes, día para evitar problemas de zona horaria
+        function parseLocalDate(dateString) {
+            if (!dateString) return null;
+            const parts = dateString.split('-');
+            if (parts.length !== 3) return null;
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        function calculateAge() {
+            // Reiniciar estado
+            errorMsg.style.display = 'none';
+            resultsContainer.style.display = 'none';
+
+            if (!dobInput.value) {
+                errorMsg.textContent = 'Por favor, ingresa tu fecha de nacimiento.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            const birthDate = parseLocalDate(dobInput.value);
+            const targetDate = parseLocalDate(currentDateInput.value);
+
+            if (!targetDate) {
+                errorMsg.textContent = 'Por favor, ingresa una fecha actual válida.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (birthDate > targetDate) {
+                errorMsg.textContent = 'La fecha de nacimiento no puede ser posterior a la fecha actual.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Cálculo preciso de años, meses y días
+            let years = targetDate.getFullYear() - birthDate.getFullYear();
+            let months = targetDate.getMonth() - birthDate.getMonth();
+            let days = targetDate.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                // Días en el mes anterior al de la fecha objetivo
+                const tempDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 0);
+                days += tempDate.getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            // Total de días vividos
+            // Utilizamos getTime() para obtener la diferencia en milisegundos y evitar DST issues
+            const MS_PER_DAY = 1000 * 60 * 60 * 24;
+            const utcBirth = Date.UTC(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            const utcTarget = Date.UTC(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+            const totalDays = Math.floor((utcTarget - utcBirth) / MS_PER_DAY);
+
+            // Próximo cumpleaños
+            let nextBday = new Date(targetDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBday < targetDate && nextBday.getTime() !== targetDate.getTime()) {
+                nextBday.setFullYear(targetDate.getFullYear() + 1);
+            }
+            
+            const utcNextBday = Date.UTC(nextBday.getFullYear(), nextBday.getMonth(), nextBday.getDate());
+            const diffNextBday = Math.floor((utcNextBday - utcTarget) / MS_PER_DAY);
+            
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const nextBdayStr = nextBday.toLocaleDateString('es-ES', options);
+
+            // Actualizar interfaz
+            resYears.textContent = `${years}`;
+            resMonths.textContent = `${months}`;
+            resDays.textContent = `${days}`;
+            
+            // Format number with periods or commas depending on locale
+            resTotalDays.textContent = new Intl.NumberFormat('es-ES').format(totalDays) + ' días';
+
+            if (diffNextBday === 0) {
+                resNextBday.textContent = `¡Hoy es tu cumpleaños! 🎉`;
+            } else {
+                resNextBday.textContent = `${nextBdayStr} (faltan ${diffNextBday} días)`;
+            }
+
+            // Mostrar resultados
+            resultsContainer.style.display = 'block';
+        }
+
+        function clearFields() {
+            dobInput.value = '';
+            initCurrentDate();
+            errorMsg.style.display = 'none';
+            resultsContainer.style.display = 'none';
+        }
+
+        // Listeners
+        btnCalculate.addEventListener('click', calculateAge);
+        btnClear.addEventListener('click', clearFields);
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', initCurrentDate);
+    </script>
+</body>
+</html>
