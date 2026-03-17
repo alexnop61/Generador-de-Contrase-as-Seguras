@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cronómetro Online | Mide tiempo con precisión</title>
+  <meta name="description" content="Cronómetro online gratuito. Mide el tiempo con precisión al milisegundo, registra vueltas y parciales fácilmente desde tu navegador." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #2563eb;
+      --primary-d: #1d4ed8;
+      --green:     #16a34a;
+      --green-d:   #15803d;
+      --orange:    #ea580c;
+      --orange-d:  #c2410c;
+      --red:       #dc2626;
+      --red-d:     #b91c1c;
+      --blue:      #0891b2;
+      --blue-d:    #0e7490;
+      --bg:        #f0f4ff;
+      --card:      #ffffff;
+      --border:    #dbeafe;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --radius:    14px;
+      --shadow:    0 4px 24px rgba(37,99,235,.10);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Layout wrappers ── */
+    .page-wrapper { width: 100%; max-width: 860px; padding: 0 16px; display: flex; flex-direction: column; align-items: center; }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 18px; font-size: .88rem; color: var(--primary);
+      text-decoration: none; font-weight: 500; align-self: flex-start;
+      transition: gap .2s;
+    }
+    .back-link:hover { gap: 10px; }
+
+    /* ── Ad spaces ── */
+    .ad-top {
+      width: 100%; max-width: 728px; height: 90px;
+      border: 2px dashed #93c5fd; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #93c5fd; font-size: .82rem; font-weight: 500;
+      margin: 18px 0 8px;
+    }
+    .ad-side {
+      width: 300px; min-width: 300px; height: 250px;
+      border: 2px dashed #93c5fd; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #93c5fd; font-size: .82rem; font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* ── Header ── */
+    header { text-align: center; margin: 10px 0 24px; }
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #1d4ed8, #0891b2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+    }
+    header p { color: var(--muted); font-size: 1rem; margin-top: 6px; }
+
+    /* ── Content row ── */
+    .content-row {
+      display: flex; gap: 28px; align-items: flex-start;
+      width: 100%;
+    }
+
+    /* ── Main card ── */
+    .main-card {
+      flex: 1; background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 32px 28px; border: 1px solid var(--border);
+    }
+
+    /* ── Display ── */
+    .display-wrap {
+      background: linear-gradient(135deg, #0f172a, #1e3a5f);
+      border-radius: 12px; padding: 28px 16px;
+      text-align: center; margin-bottom: 28px;
+      box-shadow: 0 8px 32px rgba(15,23,42,.35);
+    }
+    #time-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(3rem, 10vw, 5rem);
+      color: #e0f2fe;
+      letter-spacing: 4px;
+      text-shadow: 0 0 30px rgba(56,189,248,.4);
+      line-height: 1;
+    }
+    .display-label {
+      font-size: .72rem; color: #94a3b8; letter-spacing: 3px;
+      text-transform: uppercase; margin-top: 10px;
+    }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .btn {
+      flex: 1; min-width: 110px; padding: 14px 10px;
+      border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; color: #fff; transition: transform .12s, box-shadow .12s, opacity .12s;
+      letter-spacing: .5px;
+    }
+    .btn:active { transform: scale(.96); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn-start    { background: linear-gradient(135deg, #16a34a, #15803d); box-shadow: 0 4px 14px rgba(22,163,74,.35); }
+    .btn-pause    { background: linear-gradient(135deg, #ea580c, #c2410c); box-shadow: 0 4px 14px rgba(234,88,12,.35); }
+    .btn-reset    { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 4px 14px rgba(220,38,38,.35); }
+    .btn-lap      { background: linear-gradient(135deg, #0891b2, #0e7490); box-shadow: 0 4px 14px rgba(8,145,178,.35); }
+    .btn-clear    { background: linear-gradient(135deg, #475569, #334155); box-shadow: 0 4px 14px rgba(71,85,105,.25); font-size: .88rem; }
+
+    .btn:not(:disabled):hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    /* ── Laps ── */
+    .laps-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .laps-title { font-size: .9rem; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    .laps-list {
+      max-height: 220px; overflow-y: auto;
+      padding-right: 4px;
+    }
+    .laps-list::-webkit-scrollbar { width: 5px; }
+    .laps-list::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    .laps-list::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+
+    .lap-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 14px; border-radius: 8px; margin-bottom: 6px;
+      background: #f8faff; border: 1px solid #e0eaff;
+      font-size: .92rem; animation: slideIn .2s ease;
+    }
+    .lap-num { font-weight: 700; color: var(--primary); }
+    .lap-time { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text); }
+    .lap-diff { font-size: .78rem; color: var(--muted); }
+
+    .no-laps { text-align: center; color: #b0bec5; font-size: .88rem; padding: 20px 0; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Footer ── */
+    footer { width: 100%; }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .content-row { flex-direction: column; }
+      .ad-side { width: 100%; min-width: unset; }
+      .btn { min-width: 80px; font-size: .9rem; padding: 13px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Back link -->
+  <a href="https://tools.nocturnmc.com/" class="back-link">← Volver a la página principal</a>
+
+  <!-- Top ad -->
+  <div class="ad-top">Espacio para anuncio — 728×90</div>
+
+  <!-- Header -->
+  <header>
+    <h1>⏱ Cronómetro Online</h1>
+    <p>Mide tiempo con precisión</p>
+  </header>
+
+  <!-- Content row -->
+  <div class="content-row">
+
+    <!-- Main card -->
+    <div class="main-card">
+
+      <!-- Display -->
+      <div class="display-wrap">
+        <div id="time-display">00:00:00</div>
+        <div class="display-label">horas &nbsp;·&nbsp; minutos &nbsp;·&nbsp; segundos</div>
+      </div>
+
+      <!-- Control buttons -->
+      <div class="btn-row">
+        <button id="btn-start" class="btn btn-start" onclick="startStop()">▶ Iniciar</button>
+        <button id="btn-pause" class="btn btn-pause" onclick="pause()" disabled>⏸ Pausa</button>
+        <button id="btn-reset" class="btn btn-reset" onclick="reset()">↺ Reiniciar</button>
+      </div>
+
+      <!-- Lap buttons -->
+      <div class="btn-row">
+        <button id="btn-lap" class="btn btn-lap" onclick="recordLap()" disabled>⚑ Vuelta</button>
+        <button class="btn btn-clear" onclick="clearLaps()">✕ Limpiar vueltas</button>
+      </div>
+
+      <!-- Laps -->
+      <div class="laps-header">
+        <span class="laps-title">Vueltas / Parciales</span>
+        <span id="lap-count" style="font-size:.8rem;color:var(--muted)"></span>
+      </div>
+      <div class="laps-list" id="laps-list">
+        <div class="no-laps" id="no-laps-msg">Aún no hay vueltas registradas.</div>
+      </div>
+
+    </div>
+
+    <!-- Side ad -->
+    <div class="ad-side">Espacio para anuncio — 300×250</div>
+
+  </div>
+
+</div><!-- /page-wrapper -->
+
+<!-- Footer -->
+<footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.9em; color: #666; width:100%;">
+  <p>
+    <a href="https://tools.nocturnmc.com/" style="color: #3498db; text-decoration: none; margin: 0 10px;">Inicio</a> |
+    <a href="https://tools.nocturnmc.com/privacidad.html" style="color: #3498db; text-decoration: none; margin: 0 10px;">Política de Privacidad</a>
+  </p>
+  <p style="margin-top: 10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+</footer>
+
+<script>
+  /* ── State ── */
+  let startTime   = 0;   // performance.now() when timer last started
+  let elapsed     = 0;   // ms accumulated before last pause
+  let lastLapElapsed = 0; // elapsed at last lap
+  let running     = false;
+  let rafId       = null;
+  let laps        = [];
+
+  /* ── DOM refs ── */
+  const display   = document.getElementById('time-display');
+  const btnStart  = document.getElementById('btn-start');
+  const btnPause  = document.getElementById('btn-pause');
+  const btnLap    = document.getElementById('btn-lap');
+  const lapsList  = document.getElementById('laps-list');
+  const lapCount  = document.getElementById('lap-count');
+  const noLapsMsg = document.getElementById('no-laps-msg');
+
+  /* ── Helpers ── */
+  function pad(n, digits = 2) { return String(n).padStart(digits, '0'); }
+
+  function msToHMSms(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const h  = Math.floor(totalSec / 3600);
+    const m  = Math.floor((totalSec % 3600) / 60);
+    const s  = totalSec % 60;
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+
+  /* ── Tick ── */
+  function tick() {
+    const now = performance.now();
+    const total = elapsed + (now - startTime);
+    display.textContent = msToHMSms(total);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  /* ── Controls ── */
+  function startStop() {
+    if (running) return;
+    running   = true;
+    startTime = performance.now();
+    rafId = requestAnimationFrame(tick);
+
+    btnStart.disabled = true;
+    btnPause.disabled = false;
+    btnLap.disabled   = false;
+    btnStart.textContent = '▶ Iniciar';
+  }
+
+  function pause() {
+    if (!running) return;
+    running = false;
+    cancelAnimationFrame(rafId);
+    elapsed += performance.now() - startTime;
+
+    btnStart.disabled = false;
+    btnStart.textContent = '▶ Continuar';
+    btnPause.disabled = true;
+    btnLap.disabled   = true;
+  }
+
+  function reset() {
+    running = false;
+    cancelAnimationFrame(rafId);
+    elapsed       = 0;
+    lastLapElapsed = 0;
+    display.textContent = '00:00:00';
+
+    btnStart.disabled = false;
+    btnStart.textContent = '▶ Iniciar';
+    btnPause.disabled = true;
+    btnLap.disabled   = true;
+  }
+
+  function currentElapsed() {
+    return running ? elapsed + (performance.now() - startTime) : elapsed;
+  }
+
+  function recordLap() {
+    const total = currentElapsed();
+    const diff  = total - lastLapElapsed;
+    lastLapElapsed = total;
+
+    laps.push({ n: laps.length + 1, total, diff });
+    renderLaps();
+  }
+
+  function clearLaps() {
+    laps = [];
+    lastLapElapsed = 0;
+    renderLaps();
+  }
+
+  function renderLaps() {
+    if (laps.length === 0) {
+      lapsList.innerHTML = '<div class="no-laps" id="no-laps-msg">Aún no hay vueltas registradas.</div>';
+      lapCount.textContent = '';
+      return;
+    }
+    lapCount.textContent = `${laps.length} vuelta${laps.length !== 1 ? 's' : ''}`;
+
+    // Build HTML newest-first
+    let html = '';
+    for (let i = laps.length - 1; i >= 0; i--) {
+      const lap = laps[i];
+      html += `
+        <div class="lap-item">
+          <span class="lap-num">Vuelta ${lap.n}</span>
+          <span class="lap-time">${msToHMSms(lap.total)}</span>
+          <span class="lap-diff">+${msToHMSms(lap.diff)}</span>
+        </div>`;
+    }
+    lapsList.innerHTML = html;
+
+    // Scroll to top (newest)
+    lapsList.scrollTop = 0;
+  }
+
+  /* ── Keep running behind inactive tabs ──
+     requestAnimationFrame pauses in hidden tabs. We complement it with
+     a setInterval that updates the display when the tab is not visible. */
+  setInterval(() => {
+    if (running && document.hidden) {
+      const total = elapsed + (performance.now() - startTime);
+      display.textContent = msToHMSms(total);
+    }
+  }, 500);
+
+  // Resume rAF when tab becomes visible again
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && running) {
+      cancelAnimationFrame(rafId); // safety cancel
+      rafId = requestAnimationFrame(tick);
+    }
+  });
+</script>
+</body>
+</html>
