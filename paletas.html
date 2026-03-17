@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Paletas de Colores – Utilidades Gratis</title>
+    <meta name="description" content="Genera paletas de colores armónicas al instante. Obtén colores análogos, complementarios y de contraste con un solo clic.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --border: #e1e8f0;
+            --text-main: #1a202c;
+            --text-muted: #718096;
+            --accent: #3498db;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* ── Top Nav ── */
+        .top-nav {
+            padding: 14px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        .top-nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: opacity .2s;
+        }
+        .top-nav a:hover { opacity: .75; }
+
+        /* ── Wrapper ── */
+        .wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ── Ad spaces ── */
+        .ad-banner {
+            width: 728px;
+            max-width: 100%;
+            height: 90px;
+            border: 2px dashed #b0bec5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #90a4ae;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: .05em;
+            margin: 24px auto 0;
+            background: #f8fafc;
+        }
+        .ad-square {
+            width: 300px;
+            height: 250px;
+            border: 2px dashed #b0bec5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #90a4ae;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: .05em;
+            margin: 32px auto 0;
+            background: #f8fafc;
+        }
+
+        /* ── Header ── */
+        .hero {
+            text-align: center;
+            padding: 40px 0 28px;
+        }
+        .hero h1 {
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.15;
+        }
+        .hero p {
+            margin-top: 10px;
+            font-size: 1.05rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Controls ── */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        .color-picker-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 20px;
+            box-shadow: var(--shadow);
+        }
+        .color-picker-wrap label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        #colorPicker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        #colorPicker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 50%; }
+        #colorPicker::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+        .btn-random {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102,126,234,.35);
+            transition: transform .2s, box-shadow .2s;
+        }
+        .btn-random:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,.45);
+        }
+        .btn-random:active { transform: translateY(0); }
+
+        /* ── Palette Grid ── */
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .color-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform .25s, box-shadow .25s;
+            cursor: default;
+        }
+        .color-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+        }
+
+        .color-swatch {
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 14px;
+            position: relative;
+        }
+
+        .swatch-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            opacity: .75;
+            margin-bottom: 6px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: rgba(0,0,0,.12);
+        }
+
+        .hex-code {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+
+        .color-meta {
+            background: var(--surface);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .color-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .btn-copy {
+            position: relative;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background .2s, border-color .2s;
+            white-space: nowrap;
+        }
+        .btn-copy:hover { background: #e8edf5; border-color: #b0bec5; }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%) scale(.9);
+            background: #1a202c;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .2s, transform .2s;
+        }
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1a202c;
+        }
+        .tooltip.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* ── Info text ── */
+        .info-text {
+            text-align: center;
+            margin-top: 28px;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            font-style: italic;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 720px) {
+            .palette {
+                grid-template-columns: 1fr;
+            }
+            .color-swatch { height: 100px; }
+        }
+        @media (min-width: 721px) and (max-width: 860px) {
+            .palette {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Nav -->
+    <nav class="top-nav">
+        <a href="https://tools.nocturnmc.com/">← Volver a la página principal</a>
+    </nav>
+
+    <div class="wrapper">
+
+        <!-- Top Ad -->
+        <div class="ad-banner">Espacio para anuncio – 728×90</div>
+
+        <!-- Hero -->
+        <header class="hero">
+            <h1>🎨 Generador de Paletas de Colores</h1>
+            <p>Crea combinaciones armónicas al instante</p>
+        </header>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="color-picker-wrap">
+                <label for="colorPicker">Color base</label>
+                <input type="color" id="colorPicker" value="#3498db">
+            </div>
+            <button class="btn-random" id="randomBtn">
+                🎲 Aleatorio
+            </button>
+        </div>
+
+        <!-- Palette -->
+        <div class="palette" id="palette"></div>
+
+        <!-- Info -->
+        <p class="info-text">
+            Usa estos códigos en tus diseños, redes sociales o proyectos.
+        </p>
+
+        <!-- Bottom Ad -->
+        <div class="ad-square">Espacio para anuncio – 300×250</div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.9em; color: #666;">
+        <p>
+            <a href="https://tools.nocturnmc.com/" style="color: #3498db; text-decoration: none; margin: 0 10px;">Inicio</a> |
+            <a href="https://tools.nocturnmc.com/privacidad.html" style="color: #3498db; text-decoration: none; margin: 0 10px;">Política de Privacidad</a>
+        </p>
+        <p style="margin-top: 10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+    </footer>
+
+    <script>
+        /* ── Utilities ── */
+        function hexToHsl(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+        }
+
+        function hslToHex(h, s, l) {
+            h = ((h % 360) + 360) % 360;
+            s = Math.max(0, Math.min(100, s));
+            l = Math.max(0, Math.min(100, l));
+            const s1 = s / 100, l1 = l / 100;
+            const a = s1 * Math.min(l1, 1 - l1);
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const col = l1 - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+                return Math.round(255 * col).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        /* Decide text color (black/white) based on hex background */
+        function textColor(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            // Luminance formula
+            const L = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255);
+            return L > 0.45 ? '#1a202c' : '#ffffff';
+        }
+
+        /* Generate palette of 5 from a hex base */
+        function generatePalette(hex) {
+            const [h, s, l] = hexToHsl(hex);
+            return [
+                { hex: hex,                             name: 'Base' },
+                { hex: hslToHex(h + 30, s, l),          name: 'Análogo 1' },
+                { hex: hslToHex(h - 30, s, l),          name: 'Análogo 2' },
+                { hex: hslToHex(h + 180, s, l),         name: 'Complementario' },
+                { hex: hslToHex(h, s, l > 50 ? Math.max(l - 40, 10) : Math.min(l + 40, 90)), name: 'Contraste' },
+            ];
+        }
+
+        /* Build a single card */
+        function buildCard(item) {
+            const fg = textColor(item.hex);
+            const card = document.createElement('div');
+            card.className = 'color-card';
+
+            card.innerHTML = `
+                <div class="color-swatch" style="background:${item.hex}; color:${fg}">
+                    <span class="swatch-label" style="color:${fg}">${item.name}</span>
+                    <span class="hex-code">${item.hex.toUpperCase()}</span>
+                </div>
+                <div class="color-meta">
+                    <span class="color-name">${item.name}</span>
+                    <button class="btn-copy" data-hex="${item.hex.toUpperCase()}">
+                        Copiar
+                        <span class="tooltip">¡Copiado!</span>
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        /* Render palette */
+        function renderPalette(hex) {
+            const palette = document.getElementById('palette');
+            palette.innerHTML = '';
+            generatePalette(hex).forEach(item => palette.appendChild(buildCard(item)));
+        }
+
+        /* Copy handler via event delegation */
+        document.getElementById('palette').addEventListener('click', e => {
+            const btn = e.target.closest('.btn-copy');
+            if (!btn) return;
+            const hex = btn.dataset.hex;
+            navigator.clipboard.writeText(hex).catch(() => {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = hex; document.body.appendChild(ta);
+                ta.select(); document.execCommand('copy');
+                document.body.removeChild(ta);
+            });
+            const tip = btn.querySelector('.tooltip');
+            tip.classList.add('show');
+            setTimeout(() => tip.classList.remove('show'), 1600);
+        });
+
+        /* Color picker */
+        const picker = document.getElementById('colorPicker');
+        picker.addEventListener('input', () => renderPalette(picker.value));
+
+        /* Random button */
+        document.getElementById('randomBtn').addEventListener('click', () => {
+            const rand = '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+            picker.value = rand;
+            renderPalette(rand);
+        });
+
+        /* Initial render */
+        renderPalette(picker.value);
+    </script>
+</body>
+</html>
