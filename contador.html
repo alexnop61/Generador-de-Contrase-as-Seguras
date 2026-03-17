@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Caracteres y Palabras</title>
+    <style>
+        /* Variables de color y diseño (Esquema Morado Moderno) */
+        :root {
+            --primary: #8b5cf6; /* Violeta principal */
+            --primary-hover: #7c3aed; /* Violeta más oscuro para interacciones */
+            --bg-body: #f3f4f6; /* Fondo gris muy claro */
+            --bg-card: #ffffff; /* Fondo blanco para la tarjeta central */
+            --text-main: #1f2937; /* Texto principal oscuro */
+            --text-muted: #6b7280; /* Texto secundario gris */
+            --border-color: #e5e7eb; /* Color de bordes suaves */
+            --ad-bg: #f9fafb; /* Fondo para anuncios */
+            --ad-border: #9ca3af; /* Borde de anuncios */
+        }
+
+        /* Reset básico y tipografía */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* Contenedores principales */
+        header, main, footer {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Enlace de navegación */
+        .navigation {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        /* Tarjeta Central */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .header-text {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* Área de texto */
+        .textarea-container {
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fcfcfc;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+            background-color: #ffffff;
+        }
+
+        /* Controles (Botón borrar) */
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-clear {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.25rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-clear:hover {
+            background-color: #fee2e2; /* Fondo rojizo suave al pasar el cursor */
+            color: #dc2626; /* Texto rojo */
+            border-color: #fca5a5;
+        }
+
+        /* Cuadrícula de contadores */
+        .counters-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .counter-box {
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+        }
+
+        .counter-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-color: #d1d5db;
+        }
+
+        .counter-box.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .counter-number {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .counter-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        /* Estilos para anuncios */
+        .ad-space {
+            background-color: var(--ad-bg);
+            border: 2px dashed var(--ad-border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .ad-top {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+            margin-bottom: 2rem;
+        }
+
+        .ad-bottom {
+            width: 300px;
+            height: 250px;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsividad Móvil */
+        @media (max-width: 640px) {
+            .counters-grid {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            .title {
+                font-size: 1.75rem;
+            }
+            .ad-top {
+                height: auto;
+                min-height: 90px;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenedor superior (Anuncio) -->
+    <header>
+        <div class="ad-space ad-top">
+            Espacio para anuncio (728x90)
+        </div>
+    </header>
+
+    <main>
+        <!-- Navegación -->
+        <nav class="navigation">
+            <a href="index.html" class="back-link">
+                ← Volver a la página principal
+            </a>
+        </nav>
+
+        <!-- Tarjeta Central de la Herramienta -->
+        <div class="card">
+            
+            <div class="header-text">
+                <h1 class="title">Contador de Caracteres</h1>
+                <p class="subtitle">Cuenta palabras, caracteres y más</p>
+            </div>
+
+            <!-- Área de Entrada de Texto -->
+            <div class="textarea-container">
+                <textarea id="textInput" placeholder="Escribe o pega tu texto aquí para comenzar a analizar..."></textarea>
+            </div>
+            
+            <!-- Controles -->
+            <div class="controls">
+                <button type="button" id="btnClear" class="btn-clear">
+                    <!-- Icono SVG de papelera -->
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Borrar texto
+                </button>
+            </div>
+
+            <!-- Contadores de Estadísticas -->
+            <div class="counters-grid">
+                <!-- Palabras -->
+                <div class="counter-box">
+                    <div class="counter-number" id="valWords">0</div>
+                    <div class="counter-label">Palabras</div>
+                </div>
+                
+                <!-- Caracteres -->
+                <div class="counter-box">
+                    <div class="counter-number" id="valChars">0</div>
+                    <div class="counter-label">Caracteres</div>
+                </div>
+                
+                <!-- Caracteres sin espacios -->
+                <div class="counter-box">
+                    <div class="counter-number" id="valCharsNoSpace">0</div>
+                    <div class="counter-label">Caracteres sin espacios</div>
+                </div>
+                
+                <!-- Oraciones -->
+                <div class="counter-box">
+                    <div class="counter-number" id="valSentences">0</div>
+                    <div class="counter-label">Oraciones aproximadas</div>
+                </div>
+                
+                <!-- Tiempo de lectura (ocupa ancho completo) -->
+                <div class="counter-box full-width">
+                    <div class="counter-number" id="valTime">0 min</div>
+                    <div class="counter-label">Tiempo de lectura estimado</div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Contenedor inferior (Anuncio) -->
+        <div class="ad-space ad-bottom">
+            Espacio para anuncio (300x250)
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 Herramientas Gratuitas. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Política de Privacidad</a>
+                <a href="#">Términos de Servicio</a>
+                <a href="#">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lógica JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referencias a elementos del DOM
+            const textInput = document.getElementById('textInput');
+            const btnClear = document.getElementById('btnClear');
+            
+            // Referencias a los contadores
+            const valWords = document.getElementById('valWords');
+            const valChars = document.getElementById('valChars');
+            const valCharsNoSpace = document.getElementById('valCharsNoSpace');
+            const valSentences = document.getElementById('valSentences');
+            const valTime = document.getElementById('valTime');
+
+            // Función principal de análisis de texto
+            function analyzeText() {
+                const text = textInput.value;
+                
+                // 1. Caracteres (incluyendo espacios)
+                const chars = text.length;
+                valChars.textContent = chars;
+                
+                // 2. Caracteres sin espacios (elimina espacios y saltos de línea)
+                const charsNoSpace = text.replace(/\s+/g, '').length;
+                valCharsNoSpace.textContent = charsNoSpace;
+                
+                // 3. Palabras
+                const trimmed = text.trim();
+                // Si está vacío, el arreglo estará vacío, sino separamos por espacios, saltos, etc.
+                const wordsArray = trimmed ? trimmed.split(/\s+/) : [];
+                const words = wordsArray.length;
+                valWords.textContent = words;
+                
+                // 4. Oraciones
+                // Aproximación dividiendo por punto, exclamación e interrogación
+                const sentencesArray = trimmed ? trimmed.split(/[.!?]+/).filter(s => s.trim().length > 0) : [];
+                const sentences = sentencesArray.length;
+                valSentences.textContent = sentences;
+                
+                // 5. Tiempo de lectura (estimado a 200 palabras por minuto)
+                let timeMinutes = 0;
+                if (words > 0) {
+                    timeMinutes = Math.ceil(words / 200);
+                }
+                valTime.textContent = timeMinutes + (timeMinutes === 1 ? ' min' : ' mins');
+            }
+
+            // Escuchar cada cambio en el área de texto (escribir o pegar)
+            textInput.addEventListener('input', analyzeText);
+
+            // Funcionalidad para borrar texto
+            btnClear.addEventListener('click', () => {
+                textInput.value = '';
+                analyzeText(); // Actualiza a 0
+                textInput.focus(); // Devuelve el cursor al textarea
+            });
+            
+            // Llamar al inicio por si el navegador restaura un estado previo en el textarea
+            analyzeText();
+        });
+    </script>
+</body>
+</html>
