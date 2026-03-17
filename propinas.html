@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Propinas | Divide cuentas fácilmente</title>
+  <meta name="description" content="Calculadora de propinas y división de cuenta online. Calcula cuánto paga cada persona incluyendo la propina de forma rápida y gratuita." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #0891b2;
+      --primary-d: #0e7490;
+      --green:     #059669;
+      --green-d:   #047857;
+      --teal:      #0d9488;
+      --teal-d:    #0f766e;
+      --bg:        #f0fdf9;
+      --card:      #ffffff;
+      --border:    #99f6e4;
+      --text:      #1e293b;
+      --muted:     #64748b;
+      --radius:    14px;
+      --shadow:    0 4px 24px rgba(8,145,178,.10);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Layout ── */
+    .page-wrapper {
+      width: 100%; max-width: 860px;
+      padding: 0 16px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 18px; font-size: .88rem; color: var(--primary);
+      text-decoration: none; font-weight: 500; align-self: flex-start;
+      transition: gap .2s;
+    }
+    .back-link:hover { gap: 10px; }
+
+    /* ── Ad spaces ── */
+    .ad-top {
+      width: 100%; max-width: 728px; height: 90px;
+      border: 2px dashed #5eead4; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #5eead4; font-size: .82rem; font-weight: 500;
+      margin: 18px 0 8px;
+    }
+    .ad-side {
+      width: 300px; min-width: 300px; height: 250px;
+      border: 2px dashed #5eead4; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #5eead4; font-size: .82rem; font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* ── Header ── */
+    header { text-align: center; margin: 10px 0 24px; }
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #059669, #0891b2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+    }
+    header p { color: var(--muted); font-size: 1rem; margin-top: 6px; }
+
+    /* ── Content row ── */
+    .content-row {
+      display: flex; gap: 28px; align-items: flex-start;
+      width: 100%;
+    }
+
+    /* ── Main card ── */
+    .main-card {
+      flex: 1; background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 32px 28px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: .8rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+    }
+
+    /* ── Quick tip buttons ── */
+    .tip-pills {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .tip-pill {
+      flex: 1; min-width: 64px; padding: 10px 4px;
+      border: 2px solid var(--border); border-radius: 10px;
+      background: #f0fdfa; color: var(--teal); font-weight: 700;
+      font-size: .97rem; cursor: pointer;
+      transition: background .18s, color .18s, border-color .18s, transform .12s;
+      font-family: 'Inter', sans-serif;
+    }
+    .tip-pill:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-2px); }
+    .tip-pill.active { background: linear-gradient(135deg, var(--green), var(--teal)); color: #fff; border-color: transparent; box-shadow: 0 4px 14px rgba(5,150,105,.3); }
+
+    /* ── Inputs ── */
+    .inputs-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-bottom: 28px;
+    }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label {
+      font-size: .82rem; font-weight: 600; color: var(--muted);
+      letter-spacing: .4px;
+    }
+    .input-group input {
+      padding: 12px 14px; border-radius: 10px;
+      border: 2px solid #d1fae5; font-size: 1.05rem;
+      font-family: 'Inter', sans-serif; color: var(--text);
+      background: #f0fdf9; outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8,145,178,.12);
+    }
+    .input-group input.error {
+      border-color: #f87171;
+      box-shadow: 0 0 0 3px rgba(248,113,113,.15);
+    }
+    .error-msg {
+      font-size: .74rem; color: #ef4444; font-weight: 500;
+      min-height: 16px;
+    }
+
+    /* ── Results ── */
+    .results-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    }
+    .result-card {
+      border-radius: 12px; padding: 18px 14px; text-align: center;
+      border: 1.5px solid transparent; position: relative; overflow: hidden;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .result-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(8,145,178,.15); }
+
+    .result-card.tip   { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #6ee7b7; }
+    .result-card.total { background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-color: #7dd3fc; }
+    .result-card.per   { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); border-color: #5eead4;
+                          box-shadow: 0 4px 20px rgba(5,150,105,.14); }
+
+    .result-label {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--muted); margin-bottom: 8px;
+    }
+    .result-value {
+      font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 800;
+      color: var(--text); letter-spacing: -.5px;
+    }
+    .result-card.per .result-value { color: var(--green); }
+    .result-card.per .result-label { color: var(--teal); }
+
+    /* ── Footer ── */
+    footer { width: 100%; }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .content-row    { flex-direction: column; }
+      .ad-side        { width: 100%; min-width: unset; }
+      .inputs-grid    { grid-template-columns: 1fr; }
+      .results-grid   { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 420px) {
+      .tip-pills { gap: 7px; }
+      .tip-pill  { font-size: .88rem; padding: 9px 2px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Back link -->
+  <a href="https://tools.nocturnmc.com/" class="back-link">← Volver a la página principal</a>
+
+  <!-- Top ad -->
+  <div class="ad-top">Espacio para anuncio — 728×90</div>
+
+  <!-- Header -->
+  <header>
+    <h1>💵 Calculadora de Propinas</h1>
+    <p>Divide cuentas y calcula propinas fácilmente</p>
+  </header>
+
+  <!-- Content row -->
+  <div class="content-row">
+
+    <!-- Main card -->
+    <div class="main-card">
+
+      <!-- Quick tip selector -->
+      <div class="section-title">Propina rápida</div>
+      <div class="tip-pills">
+        <button class="tip-pill" data-tip="10"  onclick="setTip(10)">10%</button>
+        <button class="tip-pill active" data-tip="15" onclick="setTip(15)">15%</button>
+        <button class="tip-pill" data-tip="18"  onclick="setTip(18)">18%</button>
+        <button class="tip-pill" data-tip="20"  onclick="setTip(20)">20%</button>
+      </div>
+
+      <!-- Inputs -->
+      <div class="inputs-grid">
+        <div class="input-group">
+          <label for="bill">Total de la cuenta ($)</label>
+          <input id="bill" type="number" min="0" step="0.01" value="50.00" oninput="calculate()" />
+          <span class="error-msg" id="err-bill"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="tip-pct">Porcentaje de propina (%)</label>
+          <input id="tip-pct" type="number" min="0" max="100" step="1" value="15" oninput="onTipInput()" />
+          <span class="error-msg" id="err-tip"></span>
+        </div>
+
+        <div class="input-group">
+          <label for="people">Número de personas</label>
+          <input id="people" type="number" min="1" step="1" value="2" oninput="calculate()" />
+          <span class="error-msg" id="err-people"></span>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="section-title">Resultados</div>
+      <div class="results-grid">
+        <div class="result-card tip">
+          <div class="result-label">Propina total</div>
+          <div class="result-value" id="res-tip">$0.00</div>
+        </div>
+        <div class="result-card total">
+          <div class="result-label">Total con propina</div>
+          <div class="result-value" id="res-total">$0.00</div>
+        </div>
+        <div class="result-card per">
+          <div class="result-label">Total por persona</div>
+          <div class="result-value" id="res-per">$0.00</div>
+        </div>
+      </div>
+
+    </div><!-- /main-card -->
+
+    <!-- Side ad -->
+    <div class="ad-side">Espacio para anuncio — 300×250</div>
+
+  </div><!-- /content-row -->
+
+</div><!-- /page-wrapper -->
+
+<!-- Footer -->
+<footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.9em; color: #666;">
+  <p>
+    <a href="https://tools.nocturnmc.com/" style="color: #3498db; text-decoration: none; margin: 0 10px;">Inicio</a> |
+    <a href="https://tools.nocturnmc.com/privacidad.html" style="color: #3498db; text-decoration: none; margin: 0 10px;">Política de Privacidad</a>
+  </p>
+  <p style="margin-top: 10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+</footer>
+
+<script>
+  /* ── Helpers ── */
+  function fmt(n) {
+    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function getVal(id) { return parseFloat(document.getElementById(id).value); }
+
+  function setError(id, msg) {
+    const el = document.getElementById(id);
+    const inp = document.querySelector(`#${id.replace('err-', '')}`);
+    el.textContent = msg;
+    if (inp) inp.classList.toggle('error', !!msg);
+  }
+
+  /* ── Tip pill state ── */
+  function setTip(pct) {
+    document.getElementById('tip-pct').value = pct;
+    document.querySelectorAll('.tip-pill').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.tip === pct);
+    });
+    calculate();
+  }
+
+  /* ── When user manually edits tip field, deselect pills ── */
+  function onTipInput() {
+    const val = +document.getElementById('tip-pct').value;
+    document.querySelectorAll('.tip-pill').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.tip === val);
+    });
+    calculate();
+  }
+
+  /* ── Main calculation ── */
+  function calculate() {
+    let valid = true;
+
+    const bill   = getVal('bill');
+    const tipPct = getVal('tip-pct');
+    let   people = getVal('people');
+
+    // Validate bill
+    if (isNaN(bill) || bill < 0) {
+      setError('err-bill', 'Ingresa un monto válido.');
+      valid = false;
+    } else {
+      setError('err-bill', '');
+    }
+
+    // Validate tip
+    if (isNaN(tipPct) || tipPct < 0) {
+      setError('err-tip', 'Ingresa un porcentaje válido.');
+      valid = false;
+    } else {
+      setError('err-tip', '');
+    }
+
+    // Validate people
+    if (isNaN(people) || people <= 0) {
+      setError('err-people', 'Mínimo 1 persona. Usando 1.');
+      people = 1;
+      document.getElementById('people').value = 1;
+    } else {
+      setError('err-people', '');
+      if (!Number.isInteger(people)) {
+        people = Math.max(1, Math.round(people));
+        document.getElementById('people').value = people;
+      }
+    }
+
+    if (!valid) return;
+
+    const tipTotal  = bill * (tipPct / 100);
+    const grandTotal = bill + tipTotal;
+    const perPerson  = grandTotal / people;
+
+    document.getElementById('res-tip').textContent   = fmt(tipTotal);
+    document.getElementById('res-total').textContent  = fmt(grandTotal);
+    document.getElementById('res-per').textContent    = fmt(perPerson);
+  }
+
+  /* ── Run on load ── */
+  calculate();
+</script>
+</body>
+</html>
