@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos QR</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+            --danger-color: #e74c3c;
+            --danger-hover: #c0392b;
+            --success-color: #2ecc71;
+            --success-hover: #27ae60;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        /* Enlace de retroceso */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Espacios para anuncios */
+        .ad-space {
+            border: 2px dashed #bbb;
+            background-color: #eee;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .ad-top {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+        }
+
+        .ad-bottom {
+            width: 100%;
+            max-width: 300px;
+            height: 250px;
+        }
+
+        /* Tarjeta principal */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Formulario */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                flex-direction: column;
+            }
+        }
+
+        /* Botones */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            flex-grow: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        /* Contenedor del QR */
+        .qr-result-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        #qr-code {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Mensajes de error */
+        .error-message {
+            color: var(--danger-color);
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+        
+    </style>
+    <!-- Incluir la librería qrcode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Enlace de retroceso -->
+        <a href="https://tools.nocturnmc.com/" class="back-link">&larr; Volver a la página principal</a>
+
+        <!-- Anuncio superior -->
+        <div class="ad-space ad-top">
+            <span>Espacio para anuncio (728x90)</span>
+        </div>
+
+        <div class="card">
+            <header>
+                <h1>Generador de Códigos QR</h1>
+                <p class="subtitle">Crea códigos QR para texto, URLs, y más</p>
+            </header>
+
+            <div id="error-msg" class="error-message">Por favor, ingresa algún texto o URL para generar el QR.</div>
+
+            <div class="form-group">
+                <label for="qr-text">Texto o URL:</label>
+                <textarea id="qr-text" placeholder="Ej: https://ejemplo.com o 'Hola mundo'"></textarea>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label for="qr-size">Tamaño:</label>
+                    <select id="qr-size">
+                        <option value="100">Pequeño (100x100)</option>
+                        <option value="200" selected>Mediano (200x200)</option>
+                        <option value="300">Grande (300x300)</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="qr-level">Corrección de errores:</label>
+                    <select id="qr-level">
+                        <option value="L">Nivel L (Bajo, ~7%)</option>
+                        <option value="M" selected>Nivel M (Medio, ~15%)</option>
+                        <option value="Q">Nivel Q (Alto, ~25%)</option>
+                        <option value="H">Nivel H (Muy alto, ~30%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" id="btn-generate">Generar QR</button>
+                <button class="btn-danger" id="btn-clear">Limpiar</button>
+            </div>
+
+            <div class="qr-result-container" id="qr-result">
+                <div id="qr-code"></div>
+                <div class="qr-actions">
+                    <button class="btn-success" id="btn-download">Descargar QR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anuncio inferior -->
+        <div class="ad-space ad-bottom">
+            <span>Espacio para anuncio (300x250)</span>
+        </div>
+    </div>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.9em; color: #666;">
+        <p>
+            <a href="https://tools.nocturnmc.com/" style="color: #3498db; text-decoration: none; margin: 0 10px;">Inicio</a> |
+            <a href="https://tools.nocturnmc.com/privacidad.html" style="color: #3498db; text-decoration: none; margin: 0 10px;">Política de Privacidad</a>
+        </p>
+        <p style="margin-top: 10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrText = document.getElementById('qr-text');
+            const qrSize = document.getElementById('qr-size');
+            const qrLevel = document.getElementById('qr-level');
+            const btnGenerate = document.getElementById('btn-generate');
+            const btnClear = document.getElementById('btn-clear');
+            const btnDownload = document.getElementById('btn-download');
+            const qrResult = document.getElementById('qr-result');
+            const qrCodeContainer = document.getElementById('qr-code');
+            const errorMsg = document.getElementById('error-msg');
+
+            let qrcode = null;
+
+            // Función para generar QR
+            function generateQR() {
+                const text = qrText.value.trim();
+                
+                if (!text) {
+                    errorMsg.style.display = 'block';
+                    qrResult.style.display = 'none';
+                    qrText.focus();
+                    return;
+                }
+
+                errorMsg.style.display = 'none';
+                
+                // Limpiar QR anterior
+                qrCodeContainer.innerHTML = '';
+                
+                const size = parseInt(qrSize.value);
+                const levelValue = qrLevel.value;
+                let correctLevel;
+                
+                switch(levelValue) {
+                    case 'L': correctLevel = QRCode.CorrectLevel.L; break;
+                    case 'M': correctLevel = QRCode.CorrectLevel.M; break;
+                    case 'Q': correctLevel = QRCode.CorrectLevel.Q; break;
+                    case 'H': correctLevel = QRCode.CorrectLevel.H; break;
+                    default: correctLevel = QRCode.CorrectLevel.M;
+                }
+
+                try {
+                    qrcode = new QRCode(qrCodeContainer, {
+                        text: text,
+                        width: size,
+                        height: size,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : correctLevel
+                    });
+                    
+                    qrResult.style.display = 'flex';
+                } catch (e) {
+                    console.error("Error al generar el código QR:", e);
+                    alert("Hubo un error al generar el código QR.");
+                }
+            }
+
+            // Función para limpiar
+            function clearAll() {
+                qrText.value = '';
+                qrSize.value = '200';
+                qrLevel.value = 'M';
+                qrCodeContainer.innerHTML = '';
+                qrResult.style.display = 'none';
+                errorMsg.style.display = 'none';
+                qrcode = null;
+                qrText.focus();
+            }
+
+            // Función para descargar
+            function downloadQR() {
+                // qrcode.js crea un canvas y una img (para compatibilidad).
+                // Buscamos la img si tiene src base64, de lo contrario buscamos el canvas.
+                const img = qrCodeContainer.querySelector('img');
+                const canvas = qrCodeContainer.querySelector('canvas');
+                
+                let dataUrl = '';
+                
+                if (img && img.src && img.src.startsWith('data:image')) {
+                    dataUrl = img.src;
+                } else if (canvas) {
+                    dataUrl = canvas.toDataURL("image/png");
+                }
+
+                if (dataUrl) {
+                    const a = document.createElement('a');
+                    a.href = dataUrl;
+                    a.download = 'codigo-qr.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert('No se pudo descargar el código QR. Inténtalo de nuevo.');
+                }
+            }
+
+            // Event Listeners
+            btnGenerate.addEventListener('click', generateQR);
+            btnClear.addEventListener('click', clearAll);
+            btnDownload.addEventListener('click', downloadQR);
+
+            // Permitir generar al presionar Ctrl+Enter
+            qrText.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    generateQR();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
