@@ -21,6 +21,42 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tools.nocturnmc.com/edad.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/qr.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/cronometro.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/propinas.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/paletas.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/dias.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/nombres.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/escritura.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tools.nocturnmc.com/seo.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tools.nocturnmc.com/privacidad.html</loc>
     <priority>0.5</priority>
   </url>
