@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilidades Gratis - Herramientas Útiles Online</title>
+    <meta name="description" content="Selecciona la herramienta que necesitas. Herramientas gratuitas online para tu día a día.">
+    
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #3b82f6; /* Modern Blue */
+            --primary-hover: #2563eb;
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 4rem 1rem 2rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        h1 span {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* AD CONTAINERS */
+        .ad-container {
+            margin: 2rem auto;
+            border: 2px dashed #94a3b8;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            background-color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .ad-container:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .ad-728x90 {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            padding: 2rem 0 3rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* TOOL CARDS */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-hover-shadow);
+            border-color: transparent;
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .icon-wrapper {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1);
+        }
+
+        .card:hover .icon-wrapper {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.75rem;
+            flex-grow: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.8rem 1.25rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: background-color 0.2s ease, transform 0.1s;
+        }
+
+        .card:hover .btn {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        /* FOOTER */
+        footer {
+            background-color: var(--surface);
+            border-top: 1px solid var(--border-color);
+            padding: 2.5rem 0;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-up {
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .tools-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+            }
+            h1 { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 640px) {
+            .tools-grid { 
+                grid-template-columns: 1fr; 
+            }
+            h1 { font-size: 2.25rem; }
+            .subtitle { font-size: 1.1rem; }
+            header { padding: 3rem 1rem 1.5rem; }
+            
+            /* Responsive ad adjustment for mobile */
+            .ad-container::before {
+                content: "Anuncio responsive";
+            }
+            .ad-container p {
+                display: none;
+            }
+            .ad-728x90 {
+                height: 100px; /* Make it a bit taller on mobile for standard mobile banners */
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="container">
+        <h1 class="animate-up">Utilidades<span>Gratis</span></h1>
+        <p class="subtitle animate-up delay-1">Selecciona la herramienta que necesitas</p>
+    </header>
+
+    <div class="container animate-up delay-1">
+        <!-- ESPACIO PARA ANUNCIO SUPERIOR (728x90) -->
+        <div class="ad-container ad-728x90">
+            <p>Espacio para anuncio (728x90)</p>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="tools-grid">
+            
+            <!-- Herramienta 1: Generador de Contraseñas -->
+            <a href="#" class="card animate-up delay-1">
+                <div class="icon-wrapper">
+                    <span class="icon">🔐</span>
+                </div>
+                <h3>Generador de Contraseñas</h3>
+                <p>Crea contraseñas seguras al instante</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 2: Calculadora de IMC -->
+            <a href="#" class="card animate-up delay-2">
+                <div class="icon-wrapper">
+                    <span class="icon">⚖️</span>
+                </div>
+                <h3>Calculadora de IMC</h3>
+                <p>Sabes si tu peso es saludable</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 3: Conversor de Unidades -->
+            <a href="#" class="card animate-up delay-3">
+                <div class="icon-wrapper">
+                    <span class="icon">🧮</span>
+                </div>
+                <h3>Conversor de Unidades</h3>
+                <p>Longitud, peso, volumen, temperatura</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 4: Contador de Caracteres -->
+            <a href="#" class="card animate-up delay-4">
+                <div class="icon-wrapper">
+                    <span class="icon">📏</span>
+                </div>
+                <h3>Contador de Caracteres</h3>
+                <p>Cuenta palabras y caracteres</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+        </div>
+    </main>
+
+    <div class="container animate-up delay-4">
+        <!-- ESPACIO PARA ANUNCIO CENTRAL (728x90) -->
+        <div class="ad-container ad-728x90" style="margin-top: 0; margin-bottom: 2rem;">
+            <p>Espacio para anuncio (728x90)</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a href="#">Política de privacidad</a>
+                <a href="#">Contacto</a>
+            </div>
+            <p class="copyright">© 2026 UtilidadesGratis - Herramientas online gratuitas</p>
+        </div>
+    </footer>
+
+    <script>
+        // Lógica para añadir interactividad básica a los botones/enlaces
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Previene recargar la página si el enlace es "#"
+                if(this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    
+                    const btn = this.querySelector('.btn');
+                    const originalText = btn.innerHTML;
+                    
+                    // Efecto visual de "cargando"
+                    btn.innerHTML = "Abriendo...";
+                    btn.style.opacity = "0.8";
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.opacity = "1";
+                    }, 600);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
