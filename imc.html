@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de IMC</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --primary-hover: #004494;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            
+            /* Colores de la OMS */
+            --color-underweight: #3498db; /* Azul */
+            --color-normal: #2ecc71;      /* Verde */
+            --color-overweight: #f39c12;  /* Naranja */
+            --color-obese: #e74c3c;       /* Rojo */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Navegación al inicio */
+        .nav-back {
+            align-self: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .nav-back a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 15px;
+        }
+
+        .nav-back a:hover {
+            text-decoration: underline;
+        }
+
+        /* Espacios para anuncios */
+        .ad-space {
+            background-color: #f9f9f9;
+            border: 2px dashed #bbbbbb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .ad-top {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+        }
+
+        .ad-bottom {
+            width: 300px;
+            height: 250px;
+            margin-top: 30px;
+        }
+
+        /* Tarjeta principal */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-size: 26px;
+        }
+
+        .header h1 span {
+            color: var(--primary-color);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        /* Formulario */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #fcfcfc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
+            background-color: #fff;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0, 86, 179, 0.2);
+        }
+
+        .btn-calculate:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0, 86, 179, 0.3);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 86, 179, 0.2);
+        }
+
+        /* Mensaje de Error */
+        .error-message {
+            color: var(--color-obese);
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        /* Resultados */
+        .result-container {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bmi-value-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .bmi-value {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .bmi-category {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .bmi-recommendation {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-links {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .card {
+                padding: 30px 20px;
+            }
+            
+            .ad-top {
+                max-height: 90px;
+                height: auto;
+                aspect-ratio: 728/90; /* Mantiene la proporción en móviles */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Navegación -->
+        <div class="nav-back">
+            <a href="index.html">← Volver a la página principal</a>
+        </div>
+
+        <!-- Espacio Anuncio Superior -->
+        <div class="ad-space ad-top">
+            Espacio para anuncio (728x90)
+        </div>
+
+        <!-- Tarjeta Principal de la Calculadora -->
+        <div class="card">
+            <div class="header">
+                <h1>Calculadora de <span>IMC</span></h1>
+                <p>Descubre si tu peso es saludable</p>
+            </div>
+
+            <div id="errorMessage" class="error-message">
+                Por favor, ingresa números válidos mayores a cero en ambos campos.
+            </div>
+
+            <div class="form-group">
+                <label for="weight">Peso (kg)</label>
+                <input type="number" id="weight" value="70" step="0.1" min="1" placeholder="Ej: 70" required>
+            </div>
+
+            <div class="form-group">
+                <label for="height">Altura (cm)</label>
+                <input type="number" id="height" value="170" step="1" min="1" placeholder="Ej: 170" required>
+            </div>
+
+            <button class="btn-calculate" onclick="calculateBMI()">Calcular IMC</button>
+
+            <!-- Sección de Resultados (Oculta por defecto) -->
+            <div id="resultContainer" class="result-container">
+                <div class="bmi-value-label">Tu índice es</div>
+                <div id="bmiValue" class="bmi-value">--</div>
+                <div id="bmiCategory" class="bmi-category">--</div>
+                <p id="bmiRecommendation" class="bmi-recommendation">--</p>
+            </div>
+        </div>
+
+        <!-- Espacio Anuncio Inferior -->
+        <div class="ad-space ad-bottom">
+            Espacio para anuncio (300x250)
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">Política de privacidad</a>
+            <a href="#">Contacto</a>
+        </div>
+        <div class="copyright">
+            &copy; 2026 Calculadora de IMC. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- Lógica JavaScript (Interna) -->
+    <script>
+        function calculateBMI() {
+            // Obtener referencias a los elementos
+            const weightInput = document.getElementById('weight').value;
+            const heightInput = document.getElementById('height').value;
+            const errorMsg = document.getElementById('errorMessage');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            // Convertir a números
+            const weight = parseFloat(weightInput);
+            const height = parseFloat(heightInput);
+
+            // Validación de los campos
+            if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
+                errorMsg.style.display = 'block';
+                resultContainer.classList.remove('show');
+                return;
+            }
+
+            // Ocultar mensaje de error si todo está correcto
+            errorMsg.style.display = 'none';
+
+            // Cálculo del IMC (peso / (altura en metros al cuadrado))
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            
+            // Formatear a un decimal
+            const bmiFormatted = bmi.toFixed(1);
+
+            // Variables para actualizar la UI
+            let category = '';
+            let color = '';
+            let recommendation = '';
+
+            // Clasificación de la OMS
+            if (bmi < 18.5) {
+                category = 'Bajo peso';
+                color = 'var(--color-underweight)'; // Azul
+                recommendation = 'Es importante asegurar que estás consumiendo suficientes nutrientes. Consultar a un profesional de la salud o nutricionista puede ser beneficioso.';
+            } else if (bmi >= 18.5 && bmi <= 24.9) {
+                category = 'Normal';
+                color = 'var(--color-normal)'; // Verde
+                recommendation = '¡Excelente! Te encuentras en un rango de peso saludable. Mantén una dieta balanceada y realiza actividad física regularmente.';
+            } else if (bmi >= 25 && bmi <= 29.9) {
+                category = 'Sobrepeso';
+                color = 'var(--color-overweight)'; // Naranja
+                recommendation = 'Tu IMC indica sobrepeso. Podrías beneficiarte de ajustes menores en tu dieta y aumentar la actividad física. Evalúa consultar a un médico.';
+            } else {
+                category = 'Obesidad';
+                color = 'var(--color-obese)'; // Rojo
+                recommendation = 'Tu IMC se encuentra en la categoría de obesidad. Es muy recomendable consultar a un profesional de la salud médica para recibir orientación.';
+            }
+
+            // Actualizar la interfaz con los resultados
+            const valueEl = document.getElementById('bmiValue');
+            valueEl.textContent = bmiFormatted;
+            valueEl.style.color = color;
+            
+            const categoryEl = document.getElementById('bmiCategory');
+            categoryEl.textContent = category;
+            // Fondo semitransparente con el color correspondiente (usando código hex + opacidad)
+            // Se asume soporte moderno de navegadores para color + opacidad, 
+            // pero para mayor compatibilidad usamos background y color directo.
+            categoryEl.style.backgroundColor = `color-mix(in srgb, ${color} 15%, transparent)`;
+            categoryEl.style.color = color;
+            categoryEl.style.border = `1px solid color-mix(in srgb, ${color} 30%, transparent)`;
+
+            // Alternativa segura si color-mix no está soportado (usar sombra o border simple)
+            // Ya que tenemos las variables en el :root, solo asignamos:
+            categoryEl.style.boxShadow = `0 0 0 1px ${color} inset`;
+            categoryEl.style.backgroundColor = 'transparent';
+
+            document.getElementById('bmiRecommendation').textContent = recommendation;
+
+            // Mostrar el contenedor de resultados de forma animada
+            resultContainer.classList.add('show');
+        }
+
+        // Permitir calcular pulsando la tecla Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateBMI();
+            }
+        });
+    </script>
+</body>
+</html>
