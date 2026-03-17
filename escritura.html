@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Velocidad de Escritura - WPM | Utilidades Gratis</title>
+    <meta name="description" content="Mide cuántas palabras por minuto escribes con nuestro test de velocidad de escritura online gratuito. Calcula tu WPM y precisión al instante.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --bg: #f0fdf4;
+            --surface: #ffffff;
+            --border: #d1d5db;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            flex: 1;
+        }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 18px;
+            transition: color .2s;
+        }
+        .back-link:hover { color: var(--accent-dark); }
+
+        /* ── Ad spaces ── */
+        .ad-space {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.82em;
+            font-weight: 500;
+            letter-spacing: .5px;
+            margin: 0 auto 24px;
+            background: #f8fafc;
+        }
+        .ad-space-sq {
+            width: 300px;
+            height: 250px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.82em;
+            font-weight: 500;
+            letter-spacing: .5px;
+            margin: 28px auto 0;
+            background: #f8fafc;
+        }
+
+        /* ── Header ── */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        /* ── Sample text ── */
+        .sample-label {
+            font-size: 0.78em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        .sample-box {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--text);
+            font-weight: 400;
+            letter-spacing: .2px;
+            user-select: all;
+        }
+
+        /* ── Timer ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 16px;
+        }
+        .timer-display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            border-radius: 10px;
+            padding: 8px 24px;
+            letter-spacing: 2px;
+        }
+        .timer-status {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ── Textarea ── */
+        textarea {
+            width: 100%;
+            min-height: 110px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text);
+            resize: vertical;
+            outline: none;
+            transition: border-color .25s, box-shadow .25s;
+            background: #fafafa;
+        }
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16,185,129,.15);
+            background: #fff;
+        }
+        textarea.error-state {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,.12);
+        }
+        textarea.success-state {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+        }
+
+        .hint {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* ── Buttons ── */
+        .btn-restart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 18px auto 0;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 4px 14px rgba(16,185,129,.35);
+        }
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16,185,129,.45);
+        }
+        .btn-restart:active { transform: translateY(0); }
+
+        /* ── Results ── */
+        .results-section {
+            display: none;
+            margin-top: 4px;
+        }
+        .results-section.visible { display: block; }
+
+        .results-title {
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f0fdf4, #eff6ff);
+            border: 1px solid #d1fae5;
+            border-radius: 10px;
+            padding: 18px 12px;
+            text-align: center;
+            transition: transform .2s;
+        }
+        .result-card:hover { transform: translateY(-3px); }
+        .result-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            line-height: 1;
+        }
+        .result-card .unit {
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 2px;
+        }
+        .result-card .label {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .congrats {
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+
+        /* ── Footer ── */
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 520px) {
+            .header h1 { font-size: 1.5rem; }
+            .results-grid { grid-template-columns: 1fr 1fr; }
+            .result-card .value { font-size: 1.6rem; }
+            .timer-display { font-size: 1.7rem; }
+            .card { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Back link -->
+    <a href="https://tools.nocturnmc.com/" class="back-link">← Volver a la página principal</a>
+
+    <!-- Top ad -->
+    <div class="ad-space">📢 Espacio para anuncio (728×90)</div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>⌨️ Test de Velocidad de Escritura</h1>
+        <p>Mide cuántas palabras por minuto escribes</p>
+    </div>
+
+    <!-- Main card -->
+    <div class="card">
+        <div class="sample-label">📄 Texto de ejemplo — cópialo exactamente:</div>
+        <div class="sample-box" id="sampleText"></div>
+
+        <div class="timer-row">
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="timer-status" id="timerStatus">Empieza a escribir para iniciar el cronómetro</div>
+        </div>
+
+        <textarea
+            id="inputArea"
+            placeholder="Escribe aquí el texto de ejemplo..."
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+        ></textarea>
+        <div class="hint">💡 El cronómetro se inicia automáticamente al escribir la primera letra.</div>
+
+        <button class="btn-restart" id="restartBtn">🔄 Reiniciar</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section" id="resultsSection">
+        <div class="card">
+            <div class="results-title">🏆 ¡Test completado!</div>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="value" id="resWPM">0</div>
+                    <div class="unit">WPM</div>
+                    <div class="label">Palabras por minuto</div>
+                </div>
+                <div class="result-card">
+                    <div class="value" id="resTime">0</div>
+                    <div class="unit">segundos</div>
+                    <div class="label">Tiempo total</div>
+                </div>
+                <div class="result-card">
+                    <div class="value">100%</div>
+                    <div class="unit">Precisión</div>
+                    <div class="label">Sin errores</div>
+                </div>
+            </div>
+            <div class="congrats" id="congratsMsg"></div>
+        </div>
+
+        <!-- Square ad -->
+        <div class="ad-space-sq">📢 Espacio para anuncio (300×250)</div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>
+        <a href="https://tools.nocturnmc.com/" style="color:#3498db;text-decoration:none;margin:0 10px;">Inicio</a> |
+        <a href="https://tools.nocturnmc.com/privacidad.html" style="color:#3498db;text-decoration:none;margin:0 10px;">Política de Privacidad</a>
+    </p>
+    <p style="margin-top:10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+</footer>
+
+<script>
+    const TEXTS = [
+        "El rápido zorro marrón salta sobre el perro perezoso.",
+        "La programación web es una habilidad muy valiosa en el mundo actual.",
+        "Escribir rápido y sin errores mejora tu productividad diaria.",
+        "Las herramientas online gratuitas ayudan a millones de personas cada día.",
+        "La práctica constante es la clave para dominar cualquier habilidad."
+    ];
+
+    let currentText = "";
+    let timerInterval = null;
+    let startTime = null;
+    let elapsedSeconds = 0;
+    let running = false;
+    let finished = false;
+
+    const sampleEl   = document.getElementById("sampleText");
+    const inputEl    = document.getElementById("inputArea");
+    const timerEl    = document.getElementById("timerDisplay");
+    const statusEl   = document.getElementById("timerStatus");
+    const resultsEl  = document.getElementById("resultsSection");
+    const resWPMEl   = document.getElementById("resWPM");
+    const resTimeEl  = document.getElementById("resTime");
+    const congratsEl = document.getElementById("congratsMsg");
+    const restartBtn = document.getElementById("restartBtn");
+
+    function pickText() {
+        const idx = Math.floor(Math.random() * TEXTS.length);
+        return TEXTS[idx];
+    }
+
+    function formatTime(secs) {
+        const m = String(Math.floor(secs / 60)).padStart(2, "0");
+        const s = String(secs % 60).padStart(2, "0");
+        return `${m}:${s}`;
+    }
+
+    function startTimer() {
+        if (running) return;
+        running = true;
+        startTime = Date.now() - elapsedSeconds * 1000;
+        timerInterval = setInterval(() => {
+            elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            timerEl.textContent = formatTime(elapsedSeconds);
+        }, 200);
+        statusEl.textContent = "⏱ Cronómetro en marcha...";
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        running = false;
+    }
+
+    function getWPM(wordCount, seconds) {
+        if (seconds === 0) return wordCount * 60;
+        return Math.round((wordCount / seconds) * 60);
+    }
+
+    function getCongratsMsg(wpm) {
+        if (wpm >= 80) return "🚀 ¡Velocidad excepcional! Eres un mecanógrafo experto.";
+        if (wpm >= 60) return "🌟 ¡Muy bien! Velocidad por encima del promedio.";
+        if (wpm >= 40) return "👍 ¡Buen resultado! Estás a un nivel profesional estándar.";
+        if (wpm >= 20) return "💪 ¡Puedes mejorar! Sigue practicando cada día.";
+        return "✍️ ¡Buen comienzo! La práctica constante es la clave.";
+    }
+
+    function showResults() {
+        finished = true;
+        stopTimer();
+        inputEl.disabled = true;
+        inputEl.classList.remove("error-state");
+        inputEl.classList.add("success-state");
+
+        const wordCount = currentText.trim().split(/\s+/).length;
+        const wpm = getWPM(wordCount, elapsedSeconds);
+
+        resWPMEl.textContent  = wpm;
+        resTimeEl.textContent = elapsedSeconds;
+        congratsEl.textContent = getCongratsMsg(wpm);
+        statusEl.textContent  = "✅ ¡Completado!";
+
+        resultsEl.classList.add("visible");
+        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function reset() {
+        stopTimer();
+        elapsedSeconds = 0;
+        startTime = null;
+        running = false;
+        finished = false;
+
+        currentText = pickText();
+        sampleEl.textContent = currentText;
+
+        inputEl.value = "";
+        inputEl.disabled = false;
+        inputEl.classList.remove("error-state", "success-state");
+        inputEl.focus();
+
+        timerEl.textContent   = "00:00";
+        statusEl.textContent  = "Empieza a escribir para iniciar el cronómetro";
+        resultsEl.classList.remove("visible");
+    }
+
+    inputEl.addEventListener("input", () => {
+        if (finished) return;
+
+        const typed = inputEl.value;
+
+        if (!running && typed.length > 0) startTimer();
+
+        // Live border feedback
+        if (typed.length > 0) {
+            const isOk = currentText.startsWith(typed);
+            inputEl.classList.toggle("error-state", !isOk);
+            inputEl.classList.toggle("success-state", isOk);
+        } else {
+            inputEl.classList.remove("error-state", "success-state");
+        }
+
+        // Completion check: exact match
+        if (typed === currentText) {
+            showResults();
+        }
+    });
+
+    restartBtn.addEventListener("click", reset);
+
+    // Init
+    reset();
+</script>
+</body>
+</html>
