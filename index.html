@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contraseñas Seguras</title>
+    <style>
+        /* =========================================
+           VARIABLES Y CONFIGURACIÓN BASE
+           ========================================= */
+        :root {
+            --primary-color: #0ea5e9;    /* Azul moderno */
+            --primary-hover: #0284c7;    /* Azul oscuro */
+            --success-color: #10b981;    /* Verde éxito */
+            --bg-color: #f8fafc;         /* Fondo claro gris/azulado */
+            --surface-color: #ffffff;    /* Fondo de la tarjeta */
+            --text-main: #0f172a;        /* Texto principal */
+            --text-muted: #64748b;       /* Texto secundario */
+            --border-color: #e2e8f0;     /* Bordes */
+            --danger-color: #ef4444;     /* Color de error/advertencia */
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Tipografía del sistema para que funcione Offline sin descargar fuentes */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           HEADER Y FOOTER
+           ========================================= */
+        header {
+            text-align: center;
+            padding: 2rem 1rem 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-hover);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* =========================================
+           ESPACIOS DE ANUNCIOS (AdSense)
+           ========================================= */
+        .ad-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            color: #94a3b8;
+            font-weight: 600;
+            margin: 1.5rem auto;
+            text-align: center;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .ad-leaderboard {
+            width: 100%;
+            max-width: 728px;
+            height: 90px;
+        }
+
+        .ad-rectangle {
+            width: 300px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           LAYOUT PRINCIPAL
+           ========================================= */
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 2rem 0;
+        }
+
+        .generator-card {
+            flex: 1 1 600px;
+            max-width: 700px;
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+        }
+
+        .sidebar {
+            flex: 0 0 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        /* =========================================
+           COMPONENTES DEL GENERADOR
+           ========================================= */
+        /* Área de visualización de contraseña */
+        .password-display {
+            position: relative;
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .password-display:hover {
+            border-color: var(--primary-color);
+        }
+
+        #password-output {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.05em;
+            word-break: break-all;
+            flex: 1;
+            margin-right: 1rem;
+            font-family: monospace; /* Mejor lectura de caracteres especiales */
+        }
+
+        .btn-copy {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s ease, transform 0.1s;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-copy:active {
+            transform: scale(0.95);
+        }
+
+        .btn-copy.success {
+            background-color: var(--success-color);
+        }
+
+        /* Tooltip simple para "Copiado" */
+        .copy-tooltip {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background-color: var(--success-color);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .copy-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--success-color) transparent transparent transparent;
+        }
+
+        .copy-tooltip.show {
+            opacity: 1;
+        }
+
+        /* Controles (Rango y Checkboxes) */
+        .controls-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .length-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .length-header label {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .length-value {
+            background-color: var(--bg-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--primary-hover);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .checkbox-label:hover {
+            background-color: var(--bg-color);
+        }
+
+        input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        /* Mensaje de advertencia */
+        .warning-msg {
+            color: var(--danger-color);
+            background-color: #fee2e2;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none; /* Oculto por defecto */
+        }
+
+        /* Botón Generar */
+        .btn-generate {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-generate:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           SECCIÓN DE INFORMACIÓN (SEO / Info)
+           ========================================= */
+        .info-section {
+            max-width: 800px;
+            margin: 3rem auto;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .info-section h2 {
+            font-size: 1.75rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+
+        .info-section p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .security-tip {
+            background-color: #e0f2fe;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .security-tip span {
+            font-weight: 700;
+            color: var(--primary-hover);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* =========================================
+           RESPONSIVE (Móviles y Tablets)
+           ========================================= */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .main-content { flex-direction: column; align-items: stretch; }
+            .generator-card { padding: 1.5rem; }
+            #password-output { font-size: 1.5rem; }
+            .sidebar { flex-basis: auto; width: 100%; align-items: center; margin-top: 1rem; }
+            
+            /* Ajuste de anuncios en móviles */
+            .ad-leaderboard {
+                max-width: 320px; /* Tamaño típico de banner móvil (320x50 o 320x100) */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- HEADER -->
+        <header>
+            <h1>Generador de Contraseñas Seguras</h1>
+            <p class="subtitle">Crea contraseñas fuertes al instante y protege tus datos</p>
+        </header>
+
+        <!-- ==============================================
+             ESPACIO PARA ANUNCIO 1 (HEADER)
+             Horizontal (728x90 desktop / adaptable a móvil)
+             Pega aquí el script de Google AdSense
+             ============================================== -->
+        <div class="ad-container ad-leaderboard">
+            Espacio para anuncio (728x90)
+            <!-- Reemplazar este texto con el código del bloque de anuncios horizontal -->
+        </div>
+
+        <!-- MAIN LAYOUT -->
+        <main class="main-content">
+            
+            <!-- TARJETA DEL GENERADOR -->
+            <section class="generator-card">
+                
+                <div class="password-display">
+                    <span id="password-output">...</span>
+                    <!-- Tooltip feedback "Copiado" -->
+                    <div class="copy-tooltip" id="copy-tooltip">¡Copiado!</div>
+                    <button class="btn-copy" id="btn-copy" title="Copiar al portapapeles">
+                        <!-- Icono SVG de copiar -->
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copiar
+                    </button>
+                </div>
+
+                <!-- Oculto por defecto, se muestra si se desmarcan todos los checks -->
+                <div class="warning-msg" id="warning-msg">
+                    Debes seleccionar al menos un tipo de carácter. Se ha habilitado 'Minúsculas' automáticamente.
+                </div>
+
+                <div class="controls-group">
+                    <div class="length-header">
+                        <label for="length-slider">Longitud de la contraseña</label>
+                        <span class="length-value" id="length-val">12</span>
+                    </div>
+                    <input type="range" id="length-slider" min="6" max="30" value="12">
+                </div>
+
+                <div class="controls-group options-grid">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chk-uppercase" checked>
+                        Mayúsculas (A-Z)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chk-lowercase" checked>
+                        Minúsculas (a-z)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chk-numbers" checked>
+                        Números (0-9)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chk-symbols" checked>
+                        Símbolos (!@#$%^&*)
+                    </label>
+                </div>
+
+                <button class="btn-generate" id="btn-generate">Generar nueva contraseña</button>
+            </section>
+
+            <!-- BARRA LATERAL (Anuncios en Desktop / Debajo en Móviles) -->
+            <aside class="sidebar">
+                <!-- ==============================================
+                     ESPACIO PARA ANUNCIO 2 (SIDEBAR/MIDDLE)
+                     Rectángulo Grande (300x250)
+                     Pega aquí el script de Google AdSense
+                     ============================================== -->
+                <div class="ad-container ad-rectangle">
+                    Espacio para anuncio (300x250)
+                    <!-- Reemplazar este texto con el código del bloque rectangular -->
+                </div>
+            </aside>
+
+        </main>
+
+        <!-- SECCIÓN DE INFORMACIÓN Y CONSEJOS -->
+        <section class="info-section">
+            <h2>Por qué necesitas una contraseña fuerte</h2>
+            <p>Las contraseñas débiles son la causa principal de accesos no autorizados a cuentas personales y empresariales. Utilizar una mezcla aleatoria de letras, números y símbolos crea una barrera resistente contra los ataques de fuerza bruta.</p>
+            
+            <div class="security-tip">
+                <span>🛡️ Consejo de Seguridad</span>
+                Usa una contraseña <strong>diferente y única</strong> para cada uno de tus servicios y cuentas (redes sociales, banca, correo). Apóyate en un gestor de contraseñas para administrarlas de forma segura.
+            </div>
+        </section>
+
+        <!-- ==============================================
+             ESPACIO PARA ANUNCIO 3 (FOOTER)
+             Horizontal (728x90) antes del pie de página
+             Pega aquí el script de Google AdSense
+             ============================================== -->
+        <div class="ad-container ad-leaderboard">
+            Espacio para anuncio (728x90)
+            <!-- Reemplazar este texto con el código del bloque horizontal inferior -->
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2025 GeneradorSeguro.com - Herramienta gratuita para proteger tus cuentas.</p>
+        <p style="margin-top: 0.5rem;"><a href="#">Política de privacidad</a></p>
+    </footer>
+
+    <!-- =========================================
+         LÓGICA JAVASCRIPT
+         ========================================= -->
+    <script>
+        // DOM Elements
+        const passwordOutput = document.getElementById('password-output');
+        const lengthSlider = document.getElementById('length-slider');
+        const lengthValDisplay = document.getElementById('length-val');
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnCopy = document.getElementById('btn-copy');
+        const copyTooltip = document.getElementById('copy-tooltip');
+        const warningMsg = document.getElementById('warning-msg');
+
+        const chkUpper = document.getElementById('chk-uppercase');
+        const chkLower = document.getElementById('chk-lowercase');
+        const chkNumbers = document.getElementById('chk-numbers');
+        const chkSymbols = document.getElementById('chk-symbols');
+
+        // Character Sets
+        const charsUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const charsLower = "abcdefghijklmnopqrstuvwxyz";
+        const charsNumbers = "0123456789";
+        const charsSymbols = "!@#$%^&*";
+
+        // Funciones auxiliares para números aleatorios seguros
+        // Usa window.crypto si está disponible para mayor entropía
+        function getSecureRandomInt(max) {
+            if (window.crypto && window.crypto.getRandomValues) {
+                const randomBuffer = new Uint32Array(1);
+                window.crypto.getRandomValues(randomBuffer);
+                // Dividir entre max para asegurar un valor entre 0 y max-1
+                return randomBuffer[0] % max;
+            }
+            // Fallback en caso de navegadores muy antiguos
+            return Math.floor(Math.random() * max);
+        }
+
+        function shuffleString(str) {
+            let arr = str.split('');
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = getSecureRandomInt(i + 1);
+                [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap
+            }
+            return arr.join('');
+        }
+
+        // Función principal de generación
+        function generatePassword() {
+            warningMsg.style.display = 'none'; // Ocultar warning
+
+            let hasUpper = chkUpper.checked;
+            let hasLower = chkLower.checked;
+            let hasNumbers = chkNumbers.checked;
+            let hasSymbols = chkSymbols.checked;
+
+            // Validación estricta: si el usuario desmarca todo, forzamos minúsculas
+            if (!hasUpper && !hasLower && !hasNumbers && !hasSymbols) {
+                hasLower = true;
+                chkLower.checked = true;
+                // Mostrar advertencia
+                warningMsg.style.display = 'block';
+            }
+
+            const length = parseInt(lengthSlider.value, 10);
+            
+            let charPools = [];
+            let passwordChars = "";
+
+            // 1. Armar los grupos seleccionados y asegurar al menos 1 de cada uno
+            if (hasUpper) {
+                charPools.push(charsUpper);
+                passwordChars += charsUpper[getSecureRandomInt(charsUpper.length)];
+            }
+            if (hasLower) {
+                charPools.push(charsLower);
+                passwordChars += charsLower[getSecureRandomInt(charsLower.length)];
+            }
+            if (hasNumbers) {
+                charPools.push(charsNumbers);
+                passwordChars += charsNumbers[getSecureRandomInt(charsNumbers.length)];
+            }
+            if (hasSymbols) {
+                charPools.push(charsSymbols);
+                passwordChars += charsSymbols[getSecureRandomInt(charsSymbols.length)];
+            }
+
+            // 2. Rellenar la longitud restante eligiendo aleatoriamente de TODOS los caracteres habilitados
+            const fullPool = charPools.join('');
+            const remainingLength = length - passwordChars.length;
+            
+            for (let i = 0; i < remainingLength; i++) {
+                passwordChars += fullPool[getSecureRandomInt(fullPool.length)];
+            }
+
+            // 3. Mezclar (shuffle) la contraseña para que los caracteres fijados no estén siempre al inicio
+            const finalPassword = shuffleString(passwordChars);
+
+            // 4. Mostrar en pantalla
+            passwordOutput.textContent = finalPassword;
+
+            // Reiniciar estado el botón de copiar si estaba en "Copiado"
+            resetCopyButton();
+        }
+
+        // Función de copia al portapapeles
+        async function copyToClipboard() {
+            const passwordToCopy = passwordOutput.textContent;
+            if (!passwordToCopy || passwordToCopy === "...") return;
+
+            try {
+                // API moderna del portapapeles
+                await navigator.clipboard.writeText(passwordToCopy);
+                showCopiedFeedback();
+            } catch (err) {
+                // Fallback clásico
+                const textArea = document.createElement("textarea");
+                textArea.value = passwordToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopiedFeedback();
+                } catch (errFallback) {
+                    alert("No se pudo copiar la contraseña. Por favor, cópiala manualmente.");
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // Efectos visuales de "Copiado"
+        function showCopiedFeedback() {
+            btnCopy.classList.add('success');
+            btnCopy.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Copiado
+            `;
+            copyTooltip.classList.add('show');
+
+            // Quitar el tooltip y restaurar botón después de 2.5s
+            setTimeout(() => {
+                resetCopyButton();
+            }, 2500);
+        }
+
+        function resetCopyButton() {
+            btnCopy.classList.remove('success');
+            btnCopy.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copiar
+            `;
+            copyTooltip.classList.remove('show');
+        }
+
+        // Listeners
+        lengthSlider.addEventListener('input', (e) => {
+            lengthValDisplay.textContent = e.target.value;
+            // Generar en tiempo real a medida que se mueve el rango
+            generatePassword();
+        });
+
+        // Regenerar si se cambia alguna configuración
+        const checkboxes = [chkUpper, chkLower, chkNumbers, chkSymbols];
+        checkboxes.forEach(chk => {
+            chk.addEventListener('change', generatePassword);
+        });
+
+        btnGenerate.addEventListener('click', generatePassword);
+        btnCopy.addEventListener('click', copyToClipboard);
+
+        // Generar una contraseña automáticamente al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            generatePassword();
+        });
+    </script>
+</body>
+</html>
