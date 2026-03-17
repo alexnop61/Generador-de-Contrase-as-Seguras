@@ -110,7 +110,7 @@
 
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 1.5rem;
         }
 
@@ -259,20 +259,35 @@
             opacity: 0;
         }
         
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
+        .delay-1  { animation-delay: 0.05s; }
+        .delay-2  { animation-delay: 0.10s; }
+        .delay-3  { animation-delay: 0.15s; }
+        .delay-4  { animation-delay: 0.20s; }
+        .delay-5  { animation-delay: 0.25s; }
+        .delay-6  { animation-delay: 0.30s; }
+        .delay-7  { animation-delay: 0.35s; }
+        .delay-8  { animation-delay: 0.40s; }
+        .delay-9  { animation-delay: 0.45s; }
+        .delay-10 { animation-delay: 0.50s; }
+        .delay-11 { animation-delay: 0.55s; }
+        .delay-12 { animation-delay: 0.60s; }
+        .delay-13 { animation-delay: 0.65s; }
 
         /* RESPONSIVE DESIGN */
         @media (max-width: 1024px) {
             .tools-grid { 
-                grid-template-columns: repeat(2, 1fr); 
+                grid-template-columns: repeat(3, 1fr); 
             }
             h1 { font-size: 2.5rem; }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
             .tools-grid { 
                 grid-template-columns: 1fr; 
             }
@@ -404,7 +419,7 @@
             }
 
             .nav-toggle:checked ~ .nav-menu {
-                max-height: 400px;
+                max-height: 600px;
             }
 
             .nav-toggle:checked ~ .nav-toggle-label span {
@@ -440,6 +455,15 @@
                 <a href="imc.html" class="nav-link">IMC</a>
                 <a href="conversor.html" class="nav-link">Conversor</a>
                 <a href="contador.html" class="nav-link">Contador</a>
+                <a href="edad.html" class="nav-link">Edad</a>
+                <a href="qr.html" class="nav-link">QR</a>
+                <a href="cronometro.html" class="nav-link">Cronómetro</a>
+                <a href="propinas.html" class="nav-link">Propinas</a>
+                <a href="paletas.html" class="nav-link">Paletas</a>
+                <a href="dias.html" class="nav-link">Días</a>
+                <a href="nombres.html" class="nav-link">Nombres</a>
+                <a href="escritura.html" class="nav-link">Escritura</a>
+                <a href="seo.html" class="nav-link">SEO</a>
             </div>
         </div>
     </nav>
@@ -461,41 +485,105 @@
             
             <!-- Herramienta 1: Generador de Contraseñas -->
             <a href="generador.html" class="card animate-up delay-1">
-                <div class="icon-wrapper">
-                    <span class="icon">🔐</span>
-                </div>
+                <div class="icon-wrapper">🔐</div>
                 <h3>Generador de Contraseñas</h3>
-                <p>Crea contraseñas seguras al instante</p>
+                <p>Crea contraseñas seguras y robustas al instante</p>
                 <div class="btn">Usar herramienta</div>
             </a>
 
             <!-- Herramienta 2: Calculadora de IMC -->
             <a href="imc.html" class="card animate-up delay-2">
-                <div class="icon-wrapper">
-                    <span class="icon">⚖️</span>
-                </div>
+                <div class="icon-wrapper">⚖️</div>
                 <h3>Calculadora de IMC</h3>
-                <p>Sabes si tu peso es saludable</p>
+                <p>Descubre si tu peso es saludable según la OMS</p>
                 <div class="btn">Usar herramienta</div>
             </a>
 
             <!-- Herramienta 3: Conversor de Unidades -->
             <a href="conversor.html" class="card animate-up delay-3">
-                <div class="icon-wrapper">
-                    <span class="icon">🧮</span>
-                </div>
+                <div class="icon-wrapper">🧮</div>
                 <h3>Conversor de Unidades</h3>
-                <p>Longitud, peso, volumen, temperatura</p>
+                <p>Convierte longitud, peso, volumen y temperatura</p>
                 <div class="btn">Usar herramienta</div>
             </a>
 
             <!-- Herramienta 4: Contador de Caracteres -->
             <a href="contador.html" class="card animate-up delay-4">
-                <div class="icon-wrapper">
-                    <span class="icon">📏</span>
-                </div>
+                <div class="icon-wrapper">📏</div>
                 <h3>Contador de Caracteres</h3>
-                <p>Cuenta palabras y caracteres</p>
+                <p>Cuenta palabras, caracteres y tiempo de lectura</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 5: Calculadora de Edad -->
+            <a href="edad.html" class="card animate-up delay-5">
+                <div class="icon-wrapper">🎂</div>
+                <h3>Calculadora de Edad</h3>
+                <p>Calcula tu edad exacta en años, meses y días</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 6: Generador de Códigos QR -->
+            <a href="qr.html" class="card animate-up delay-6">
+                <div class="icon-wrapper">📱</div>
+                <h3>Generador de Códigos QR</h3>
+                <p>Crea códigos QR para textos, URLs y más</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 7: Cronómetro Online -->
+            <a href="cronometro.html" class="card animate-up delay-7">
+                <div class="icon-wrapper">⏱️</div>
+                <h3>Cronómetro Online</h3>
+                <p>Mide tiempos con vueltas y precisión al milisegundo</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 8: Calculadora de Propinas -->
+            <a href="propinas.html" class="card animate-up delay-8">
+                <div class="icon-wrapper">💰</div>
+                <h3>Calculadora de Propinas</h3>
+                <p>Calcula propinas y divide la cuenta entre personas</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 9: Generador de Paletas de Colores -->
+            <a href="paletas.html" class="card animate-up delay-9">
+                <div class="icon-wrapper">🎨</div>
+                <h3>Paletas de Colores</h3>
+                <p>Genera paletas armoniosas y copia los códigos HEX</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 10: Contador de Días entre Fechas -->
+            <a href="dias.html" class="card animate-up delay-10">
+                <div class="icon-wrapper">📅</div>
+                <h3>Días entre Fechas</h3>
+                <p>Calcula días, semanas y meses entre dos fechas</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 11: Generador de Nombres Aleatorios -->
+            <a href="nombres.html" class="card animate-up delay-11">
+                <div class="icon-wrapper">✨</div>
+                <h3>Nombres Aleatorios</h3>
+                <p>Genera nombres creativos por categoría con apellidos</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 12: Test de Velocidad de Escritura -->
+            <a href="escritura.html" class="card animate-up delay-12">
+                <div class="icon-wrapper">⌨️</div>
+                <h3>Test de Escritura</h3>
+                <p>Mide tu velocidad de escritura en palabras por minuto</p>
+                <div class="btn">Usar herramienta</div>
+            </a>
+
+            <!-- Herramienta 13: Analizador de Texto SEO -->
+            <a href="seo.html" class="card animate-up delay-13">
+                <div class="icon-wrapper">🔍</div>
+                <h3>Analizador SEO</h3>
+                <p>Analiza densidad de palabras clave y métricas de texto</p>
                 <div class="btn">Usar herramienta</div>
             </a>
 
