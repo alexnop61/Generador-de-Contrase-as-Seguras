@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Días entre Fechas – Utilidades Gratis</title>
+    <meta name="description" content="Calcula el número exacto de días entre dos fechas. Obtén el resultado en días, semanas, meses y horas de forma instantánea.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --border: #e1e8f0;
+            --text-main: #1a202c;
+            --text-muted: #718096;
+            --accent: #27ae60;
+            --accent2: #2980b9;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* ── Top Nav ── */
+        .top-nav {
+            padding: 14px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        .top-nav a {
+            color: var(--accent2);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: opacity .2s;
+        }
+        .top-nav a:hover { opacity: .75; }
+
+        /* ── Wrapper ── */
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ── Ad spaces ── */
+        .ad-banner {
+            width: 728px;
+            max-width: 100%;
+            height: 90px;
+            border: 2px dashed #b0bec5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #90a4ae;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: .05em;
+            margin: 24px auto 0;
+            background: #f8fafc;
+        }
+        .ad-square {
+            width: 300px;
+            height: 250px;
+            border: 2px dashed #b0bec5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #90a4ae;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: .05em;
+            margin: 32px auto 0;
+            background: #f8fafc;
+        }
+
+        /* ── Header ── */
+        .hero {
+            text-align: center;
+            padding: 40px 0 28px;
+        }
+        .hero h1 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.15;
+        }
+        .hero p {
+            margin-top: 10px;
+            font-size: 1.05rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        /* ── Form ── */
+        .fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .field-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        .field-group input[type="date"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            color: var(--text-main);
+            background: var(--bg);
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+            cursor: pointer;
+        }
+        .field-group input[type="date"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(39,174,96,.15);
+        }
+
+        /* ── Buttons ── */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 13px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s, opacity .2s;
+        }
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(39,174,96,.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39,174,96,.45);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(41,128,185,.3);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(41,128,185,.4);
+        }
+
+        .btn-ghost {
+            background: var(--bg);
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+        }
+        .btn-ghost:hover {
+            background: #e8edf5;
+            border-color: #b0bec5;
+            transform: translateY(-1px);
+        }
+
+        /* ── Error ── */
+        .error-msg {
+            display: none;
+            background: #fff5f5;
+            border: 1.5px solid #feb2b2;
+            border-radius: 10px;
+            color: #c53030;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .error-msg.show { display: block; }
+
+        /* ── Results ── */
+        .results {
+            display: none;
+            margin-top: 28px;
+        }
+        .results.show { display: block; }
+
+        .results-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .result-card {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+        }
+
+        .result-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .result-card.days   { border-color: #81e6a0; }
+        .result-card.days   .result-value { color: #27ae60; }
+
+        .result-card.weeks  { border-color: #90cdf4; }
+        .result-card.weeks  .result-value { color: #2980b9; }
+
+        .result-card.months { border-color: #fbb6ce; }
+        .result-card.months .result-value { color: #c0392b; }
+
+        .result-card.hours  { border-color: #fbd38d; }
+        .result-card.hours  .result-value { color: #d35400; }
+
+        .result-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 560px) {
+            .fields { grid-template-columns: 1fr; }
+            .result-grid { grid-template-columns: 1fr; }
+            .card { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Nav -->
+    <nav class="top-nav">
+        <a href="https://tools.nocturnmc.com/">← Volver a la página principal</a>
+    </nav>
+
+    <div class="wrapper">
+
+        <!-- Top Ad -->
+        <div class="ad-banner">Espacio para anuncio – 728×90</div>
+
+        <!-- Hero -->
+        <header class="hero">
+            <h1>📅 Contador de Días entre Fechas</h1>
+            <p>Calcula el número exacto de días entre dos fechas</p>
+        </header>
+
+        <!-- Main Card -->
+        <div class="card">
+
+            <!-- Date Fields -->
+            <div class="fields">
+                <div class="field-group">
+                    <label for="dateStart">Fecha inicial</label>
+                    <input type="date" id="dateStart" required>
+                </div>
+                <div class="field-group">
+                    <label for="dateEnd">Fecha final</label>
+                    <input type="date" id="dateEnd" required>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnCalc">📊 Calcular días</button>
+                <button class="btn btn-secondary" id="btnSwap">🔄 Intercambiar fechas</button>
+                <button class="btn btn-ghost" id="btnClear">🗑️ Limpiar</button>
+            </div>
+
+            <!-- Error -->
+            <div class="error-msg" id="errorMsg">
+                ⚠️ La fecha final debe ser posterior a la fecha inicial.
+            </div>
+
+            <!-- Results -->
+            <div class="results" id="results">
+                <p class="results-title">Resultado</p>
+                <div class="result-grid">
+
+                    <div class="result-card days">
+                        <span class="result-icon">📆</span>
+                        <div class="result-label">Días totales</div>
+                        <div class="result-value" id="resDays">—</div>
+                        <div class="result-sub">días</div>
+                    </div>
+
+                    <div class="result-card weeks">
+                        <span class="result-icon">🗓️</span>
+                        <div class="result-label">Semanas</div>
+                        <div class="result-value" id="resWeeks">—</div>
+                        <div class="result-sub" id="resWeeksSub"></div>
+                    </div>
+
+                    <div class="result-card months">
+                        <span class="result-icon">🗃️</span>
+                        <div class="result-label">Meses aproximados</div>
+                        <div class="result-value" id="resMonths">—</div>
+                        <div class="result-sub">meses</div>
+                    </div>
+
+                    <div class="result-card hours">
+                        <span class="result-icon">⏰</span>
+                        <div class="result-label">Horas</div>
+                        <div class="result-value" id="resHours">—</div>
+                        <div class="result-sub">horas</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /card -->
+
+        <!-- Bottom Ad -->
+        <div class="ad-square">Espacio para anuncio – 300×250</div>
+
+    </div><!-- /wrapper -->
+
+    <!-- Footer -->
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 0.9em; color: #666;">
+        <p>
+            <a href="https://tools.nocturnmc.com/" style="color: #3498db; text-decoration: none; margin: 0 10px;">Inicio</a> |
+            <a href="https://tools.nocturnmc.com/privacidad.html" style="color: #3498db; text-decoration: none; margin: 0 10px;">Política de Privacidad</a>
+        </p>
+        <p style="margin-top: 10px;">&copy; 2026 Utilidades Gratis. Herramientas online gratuitas.</p>
+    </footer>
+
+    <script>
+        /* ── Set default end date to today ── */
+        (function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateEnd').value = today;
+        })();
+
+        /* ── Helpers ── */
+        function fmt(n) {
+            return n.toLocaleString('es-ES');
+        }
+
+        function pluralize(n, singular, plural) {
+            return n === 1 ? singular : plural;
+        }
+
+        /* ── Calculate ── */
+        document.getElementById('btnCalc').addEventListener('click', calculate);
+
+        function calculate() {
+            const startVal = document.getElementById('dateStart').value;
+            const endVal   = document.getElementById('dateEnd').value;
+            const error    = document.getElementById('errorMsg');
+            const results  = document.getElementById('results');
+
+            // Reset
+            error.classList.remove('show');
+            results.classList.remove('show');
+
+            if (!startVal || !endVal) {
+                error.textContent = '⚠️ Por favor completa ambas fechas.';
+                error.classList.add('show');
+                return;
+            }
+
+            // Parse as local dates to avoid timezone shifts
+            const [sy, sm, sd] = startVal.split('-').map(Number);
+            const [ey, em, ed] = endVal.split('-').map(Number);
+            const start = new Date(sy, sm - 1, sd);
+            const end   = new Date(ey, em - 1, ed);
+
+            if (end < start) {
+                error.textContent = '⚠️ La fecha final debe ser posterior o igual a la fecha inicial.';
+                error.classList.add('show');
+                return;
+            }
+
+            const diffMs   = end - start;
+            const totalDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+            const weeks     = Math.floor(totalDays / 7);
+            const remDays   = totalDays % 7;
+            const months    = Math.round(totalDays / 30.4375); // avg days/month
+            const hours     = totalDays * 24;
+
+            // Fill values
+            document.getElementById('resDays').textContent   = fmt(totalDays);
+            document.getElementById('resWeeks').textContent  = fmt(weeks);
+            document.getElementById('resWeeksSub').textContent =
+                remDays > 0
+                    ? `y ${remDays} ${pluralize(remDays, 'día', 'días')}`
+                    : 'exactas';
+            document.getElementById('resMonths').textContent = fmt(months);
+            document.getElementById('resHours').textContent  = fmt(hours);
+
+            results.classList.add('show');
+        }
+
+        /* ── Swap dates ── */
+        document.getElementById('btnSwap').addEventListener('click', () => {
+            const s = document.getElementById('dateStart');
+            const e = document.getElementById('dateEnd');
+            const tmp = s.value;
+            s.value = e.value;
+            e.value = tmp;
+            // Recalculate if results were showing
+            if (document.getElementById('results').classList.contains('show')) {
+                calculate();
+            }
+        });
+
+        /* ── Clear ── */
+        document.getElementById('btnClear').addEventListener('click', () => {
+            document.getElementById('dateStart').value = '';
+            document.getElementById('dateEnd').value   = new Date().toISOString().split('T')[0];
+            document.getElementById('errorMsg').classList.remove('show');
+            document.getElementById('results').classList.remove('show');
+        });
+    </script>
+</body>
+</html>
